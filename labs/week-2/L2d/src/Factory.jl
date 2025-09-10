@@ -35,7 +35,7 @@ function build(modeltype::Type{MyFibonacciSequenceModel}, data::NamedTuple)::Uni
     if data.n isa Int64 && data.n >= 0
         sequencemodel.n = data.n; # set the number of elements in the sequence
     else
-        @warn "Ooops! Invalid value for n: $(data.n). Using default value: $default_size_parameter." #error will stop everything, let user know theres problm
+        @warn "Ooops! Invalid value for n: $(data.n). Using default value: $default_size_parameter."
         sequencemodel.n = default_size_parameter; # set the default value
     end
 
