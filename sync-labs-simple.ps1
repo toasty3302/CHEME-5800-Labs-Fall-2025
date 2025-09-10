@@ -36,25 +36,19 @@ $mergeResult = git merge upstream/main 2>&1
 
 # Check if there are conflicts
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "Merge conflicts detected. Auto-resolving..." -ForegroundColor Yellow
+    Write-Host "Merge conflicts detected. Using your version for ALL conflicts..." -ForegroundColor Yellow
     
     # Get list of conflicted files
     $conflictedFiles = git diff --name-only --diff-filter=U
     
     foreach ($file in $conflictedFiles) {
-        if ($file -like "*Student*" -or $file -like "*checkpoint*") {
-            Write-Host "Keeping your version of: $file" -ForegroundColor Yellow
-            git checkout --ours $file
-            git add $file
-        } else {
-            Write-Host "Taking upstream version of: $file" -ForegroundColor Yellow
-            git checkout --theirs $file
-            git add $file
-        }
+        Write-Host "Keeping your version of: $file" -ForegroundColor Yellow
+        git checkout --ours $file
+        git add $file
     }
     
     # Complete the merge
-    git commit -m "Auto-merge upstream updates"
+    git commit -m "Auto-merge upstream updates (kept local versions)"
 }
 
 # Push to your fork
@@ -74,21 +68,15 @@ if ($stashList) {
     
     # Check if there are conflicts when restoring stash
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "Conflicts detected when restoring your changes. Auto-resolving..." -ForegroundColor Yellow
+        Write-Host "Conflicts detected when restoring your changes. Using your version..." -ForegroundColor Yellow
         
         # Get list of conflicted files from stash pop
         $conflictedFiles = git diff --name-only --diff-filter=U
         
         foreach ($file in $conflictedFiles) {
-            if ($file -like "*Student*" -or $file -like "*checkpoint*") {
-                Write-Host "Keeping your version of: $file" -ForegroundColor Yellow
-                git checkout --ours $file
-                git add $file
-            } else {
-                Write-Host "Taking upstream version of: $file" -ForegroundColor Yellow
-                git checkout --theirs $file
-                git add $file
-            }
+            Write-Host "Keeping your version of: $file" -ForegroundColor Yellow
+            git checkout --ours $file
+            git add $file
         }
         
         Write-Host "Your changes have been merged successfully!" -ForegroundColor Green
