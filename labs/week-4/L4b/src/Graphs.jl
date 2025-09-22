@@ -6,9 +6,23 @@ function _LAB_BFS(graph::MySimpleDirectedGraphModel, node::MyGraphNodeModel, vis
 
     # enqueue the first node -
     enqueue!(q, node.id);
-    
-    # TODO: Implement the BFS algorithm here
-    throw(ErrorException("BFS algorithm not yet implemented!"));
+    while !isempty(q)
+        deq_node_id = dequeue!(q)
+        if deq_node_id ∉ visited
+            push!(visited,deq_node_id)
+            push!(order,deq_node_id)
+            if verbose
+                println("Visiting node: ", deq_node_id)
+            end
+            curnode = graph.nodes[deq_node_id]
+            children = mychildren(graph,curnode)
+            for child_id in children
+                if child_id ∉ visited
+                    enqueue!(q,child_id)
+                end
+            end
+        end
+    end
 end
 
 function _LAB_DFS(graph::MySimpleDirectedGraphModel, node::MyGraphNodeModel, 
@@ -18,8 +32,9 @@ function _LAB_DFS(graph::MySimpleDirectedGraphModel, node::MyGraphNodeModel,
     if (verbose == true)
         println("Visiting node: ", node.id);
     end
-
-    # TODO: Implement the DFS algorithm here
+    if node.id ∉ visited
+        push!(visited,node.id)
+        neighbors = neighbors(node)
     throw(ErrorException("DFS algorithm not yet implemented!"));
 end
 
