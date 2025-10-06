@@ -27,10 +27,12 @@ function _mysolve(A::AbstractMatrix{T}, b::AbstractVector{T}, xₒ::AbstractVect
 
         # compute the residual -
         x = copy(archive[k-1]);
-
+        residual  = b-A*x
+        current_residual = norm(residual)
+        d = DI * residual
         # TODO: Implement the computation of the residual, norm of the residual, and direction vector
         # TODO: Comment out the throws line after implementing the computation of r and d
-        throw(ErrorException("Ooops!: You need to implement the JacobiMethod"));
+        #throw(ErrorException("Ooops!: You need to implement the JacobiMethod"));
 
 
         # check the error condition -
@@ -84,11 +86,12 @@ function _mysolve(A::AbstractMatrix{T}, b::AbstractVector{T}, xₒ::AbstractVect
     while (is_ok_to_terminate == false)
 
         x = copy(archive[k-1]); # grab the current solution vector, create a copy so we don't overwrite the data in the archive
-
-
+        residual = b - A*x
+        current_residual = norm(residual)
+        d = inv(D + L) * residual 
         # TODO: Implement the computation of the residual, norm of the residual, and direction vector
         # TODO: Comment out the throws line after implementing the computation of r and d
-        throw(ErrorException("Ooops!: You need to implement the GaussSeidelMethod"));
+        #throw(ErrorException("Ooops!: You need to implement the GaussSeidelMethod"));
 
         # check the error condition -
         if (current_residual < ϵ)
