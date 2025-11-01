@@ -86,18 +86,45 @@ It returns the results of the game and the updated weights of the experts.
 function play(model::MyTwoPersonZeroSumGameModel)
 
     # initialize -
-    n = model.n; # how many experts do we have?
+    n = model.n; # how many actions do we have?
     T = model.T; # how many rounds do we play?
-    ϵ = model.ϵ; # learning rate
-    weights = model.weights; # weights of the experts
+    η = model.ϵ; # learning rate
+    weights = model.weights; # weights of the actions (row player)
     M = model.payoffmatrix; # payoff matrix
     L = -M; # loss matrix
-    results_array = zeros(Int64, T, 2); # aggregator predictions
+    results_array = zeros(Int64, T, 2); # store actions: [row_player, column_player]
 
     # main simulation loop -
-    # TODO: implement the play method for the two-person zero-sum game model
-    # TODO: remove(delete or comment out) the error exception below once implemented
-    throw(ErrorException("Ooops! The play method is not implemented yet. Better fix that."))
+    for t ∈ 1:T
+        
+        # Step 1: Compute normalization factor
+        Φ = sum(weights[t, :]);
+        
+        # Step 2: Row player computes strategy (probability distribution over actions)
+        p = weights[t, :] / Φ;
+        
+        # Row player samples an action from the categorical distribution
+        d = Categorical(p);
+        i_star = rand(d); # row player's action
+        results_array[t, 1] = i_star;
+        
+        # Step 3: Column player computes best response
+        # Column player minimizes row player's expected payoff: argmin_j p^T M e_j
+        expected_payoffs = M' * p; # compute p^T M for each column
+        j_star = argmin(expected_payoffs); # column player chooses action that minimizes row player's payoff
+        results_array[t, 2] = j_star;
+        
+        # Compute loss vector for row player: ℓ = L * q, where q = e_j
+        loss = L[:, j_star]; # loss vector (column j of L)
+        
+        # Step 4: Update weights using multiplicative update rule
+        # w_i^(t+1) = w_i^(t) * exp(-η * ℓ_i^(t))
+        if t < T # don't update weights on the last round
+            for i ∈ 1:n
+                weights[t+1, i] = weights[t, i] * exp(-η * loss[i]);
+            end
+        end
+    end
 
     # return -
     return (results_array, weights);
