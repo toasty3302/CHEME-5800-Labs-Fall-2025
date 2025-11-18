@@ -6,7 +6,7 @@ Simulate the Q-Learning agent in the given environment starting from the given s
 
 ### Arguments
 - `agent::MyQLearningAgentModel`: The Q-Learning agent model.
-- `environment::MyExperimentalContext`: The environment model.
+- `environment::MyExperimentalDrugCocktailContext`: The environment model.
 - `maxsteps::Int`: The maximum number of steps to simulate.
 - `δ::Float64 = 0.02`: The convergence threshold. Default is 0.02.
 - `worldmodel::Function = _world`: The world model function. Default is the private `_world` function.
@@ -14,7 +14,7 @@ Simulate the Q-Learning agent in the given environment starting from the given s
 ### Returns
 - `MyQLearningAgentModel`: The updated Q-Learning agent model after simulation.
 """
-function solve(agent::MyQLearningAgentModel, environment::MyExperimentalContext; 
+function solve(agent::MyQLearningAgentModel, environment::MyExperimentalDrugCocktailContext; 
     maxsteps::Int = 100, δ::Float64 = 0.02, worldmodel::Function = _world)::MyQLearningAgentModel
 
     # initialize -
@@ -28,7 +28,7 @@ function solve(agent::MyQLearningAgentModel, environment::MyExperimentalContext;
     for s ∈ states
 
         # initialize t -
-        t = 1;
+        t = 1; # trial counter
         has_converged = false;
         αₜ = copy(agent.α);   
         while (has_converged == false)
@@ -53,12 +53,17 @@ function solve(agent::MyQLearningAgentModel, environment::MyExperimentalContext;
 
             # update stuff
             s = s′; # state update
-            t += 1; # time update
+            t += 1; # trial update
             αₜ = 0.99*αₜ; # update the learning rate
 
             # check if we have converged -
-            if ((t > maxsteps) || norm(Q₂ - Q₁) < δ)
+            if ((t ≥ maxsteps) || norm(Q₂ - Q₁) ≤ δ)
                 has_converged = true;
+
+                # warn if we hit maxsteps -
+                if (t ≥ maxsteps) && (norm(Q₂ - Q₁) > δ)
+                    @warn "Maximum number of steps reached before convergence."
+                end
             end
         end
     end
@@ -67,4 +72,30 @@ function solve(agent::MyQLearningAgentModel, environment::MyExperimentalContext;
 
     # return -
     return agent
+end
+
+"""
+    mypolicy(Q_array::Array{Float64,2}) -> Array{Int,1}
+
+This function computes the policy from the Q-value function.
+
+### Arguments
+- `Q_array::Array{Float64,2}`: the Q-value function
+
+### Returns
+- `Array{Int,1}`: the policy which maps states to actions
+"""
+function mypolicy(Q_array::Array{Float64,2})::Array{Int64,1}
+
+    # get the dimension -
+    (NR, _) = size(Q_array);
+
+    # initialize some storage -
+    π_array = Array{Int64,1}(undef, NR)
+    for s ∈ 1:NR
+        π_array[s] = argmax(Q_array[s,:]);
+    end
+
+    # return -
+    return π_array;
 end

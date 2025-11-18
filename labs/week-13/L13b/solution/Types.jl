@@ -1,8 +1,8 @@
-abstract type MyAbstractContext end
+abstract type MyAbstractContextModel end
+abstract type AbstractOnlineLearningModel end
 
 """
-    mutable struct MyExperimentalContext <: MyAbstractContext
-
+    mutable struct MyExperimentalDrugCocktailContext <: MyAbstractContextModel
 A mutable type for the experimental context of the drug combination design problem.
 
 ### Fields
@@ -14,19 +14,19 @@ A mutable type for the experimental context of the drug combination design probl
 - `cost::Dict{Int, Float64}`: maps drug type to cost per mg/kg
 - `levels::Dict{Int, NamedTuple}`: maps drug level to drug concentration in mg/kg
 """
-mutable struct MyExperimentalContext <: MyAbstractContext
+mutable struct MyExperimentalDrugCocktailContext <: MyAbstractContextModel
     
     # initialize -
     K::Int64               # number of drug types
     m::Int64               # number of features per drug type
     γ::Array{Float64,1}    # effectiveness parameters
-    μ::Array{Float64,1}    # mean parameters
     B::Float64             # total budget in USD
     cost::Dict{Int, Float64}      # maps drug type to cost per mg/kg
     levels::Dict{Int, NamedTuple} # maps drug level to drug concentration in mg/kg
+    W::Float64             # weight of the patient in kg
 
     # constructor -
-    MyExperimentalContext() = new(); # create new *empty* instance 
+    MyExperimentalDrugCocktailContext() = new(); # create new *empty* instance 
 end
 
 """
