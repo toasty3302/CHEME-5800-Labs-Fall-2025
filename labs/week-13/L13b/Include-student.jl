@@ -1,6 +1,6 @@
 # setup paths -
 const _ROOT = @__DIR__
-const _PATH_TO_SRC = joinpath(_ROOT, "src");
+const _PATH_TO_SRC = joinpath(_ROOT, "solution");
 
 # check: do we need to download any packages?
 using Pkg
